@@ -59,7 +59,8 @@ List<Override> marketOverrides() => [
       // A card order opens Yoco; the shop and the tracking page share this one hook.
       orderPaymentProvider.overrideWith((ref) => SupabaseBoot.ready ? startOrderPayment : null),
       planPaymentProvider.overrideWith((ref) => SupabaseBoot.ready ? (plan) => startPlanPayment(plan.name) : null),
-      proofPhotoProvider.overrideWithValue(() async => (await pickProofPhoto()) != null),
+      // QA_FAKE_CAMERA is for screen recordings on the iOS Simulator, which has no camera.
+      proofPhotoProvider.overrideWithValue(() async => const bool.fromEnvironment('QA_FAKE_CAMERA') || (await pickProofPhoto()) != null),
       // The buyer and the seller follow an order live.
       trackMapProvider.overrideWithValue((order) => OrderTrackMap(order, key: ValueKey('track-${order.id}-${order.status.name}'))),
       // The map on an accepted job: driver, farm, customer and the route between.

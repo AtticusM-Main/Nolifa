@@ -49,7 +49,7 @@ class _DriverHomeState extends ConsumerState<DriverHome> {
     if (!mounted || _picked != b.id) return;
     setState(() => _route = r);
     try {
-      _map.fitCamera(CameraFit.bounds(bounds: LatLngBounds.fromPoints(r.line), padding: const EdgeInsets.fromLTRB(40, 120, 40, 360)));
+      _map.fitCamera(CameraFit.bounds(bounds: LatLngBounds.fromPoints(r.line), padding: const EdgeInsets.fromLTRB(40, 120, 40, 360), maxZoom: 15));
     } catch (_) {}
   }
 

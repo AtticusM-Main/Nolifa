@@ -10,6 +10,7 @@ import 'package:nolifa_grow/edition.dart';
 import 'package:nolifa_grow/main.dart' as app;
 
 const _scene = String.fromEnvironment('QA_SCENE', defaultValue: 'health');
+const _pin = String.fromEnvironment('DEMO_PIN');
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -70,14 +71,17 @@ void main() {
   }
 
   testWidgets('demo $_scene', (t) async {
-    FlutterError.onError = (d) => errors.add('[$step] ${d.exceptionAsString().split('\n').first}');
+    FlutterError.onError = (d) {
+      errors.add('[$step] ${d.exceptionAsString().split('\n').first}');
+      if (d.exceptionAsString().contains('NaN')) debugPrint('DEMO stack ${d.stack.toString().split('\n').take(8).join(' | ')}');
+    };
     await app.runNolifa(Edition.nolifa);
     await hold(t, 3);
     debugPrint('DEMO begin');
     step = 'sign in';
     final role = switch (_scene) {
-      'water' || 'track' => 'Community',
-      'roads' => 'Driver',
+      'water' || 'track' || 'order' || 'receipt' || 'pin' => 'Community',
+      'roads' || 'drive' || 'deliver' => 'Driver',
       _ => 'Farmer',
     };
     await hold(t, 1.5);
@@ -140,6 +144,69 @@ void main() {
         await tap(t, 'My orders', after: 2.5);
         await tap(t, 'Driver on the way', after: 5);
         await drag(t, -300, hold: 2);
+      case 'order':
+        await tap(t, 'Shop', last: true, after: 3);
+        await drag(t, -150, hold: 1);
+        await tap(t, 'Order now', after: 3);
+        await drag(t, -300, hold: 1);
+        await tap(t, 'Add', after: 1.2);
+        await tap(t, 'Checkout', after: 3);
+        await drag(t, -400, hold: 1.5);
+        await tap(t, 'Cash on delivery', scrollTo: true, after: 1.5);
+        await tap(t, 'Pay R', scrollTo: true, after: 5);
+        await hold(t, 2);
+        await hold(t, 3);
+      case 'pack':
+        await tap(t, 'Sell', last: true, after: 3);
+        await drag(t, -350, hold: 1.5);
+        await tap(t, 'Packed, request driver', scrollTo: true, after: 4);
+        await drag(t, -200, hold: 3);
+      case 'drive':
+        await hold(t, 2);
+        await tap(t, 'Go', after: 5);
+        await tap(t, 'drop', after: 3.5);
+        await tap(t, 'Take this batch', scrollTo: true, after: 6);
+        await tap(t, 'I collected it', after: 5);
+        await hold(t, 3);
+      case 'pin':
+        await tap(t, 'Shop', last: true, after: 3);
+        final menu = find.byIcon(Icons.menu_rounded);
+        if (menu.evaluate().isNotEmpty) await t.tap(menu.first, warnIfMissed: false);
+        await hold(t, 1.5);
+        await tap(t, 'My orders', after: 2.5);
+        await tap(t, 'UD-', after: 3.5);
+        for (var k = 0; k < 8 && find.text('Your delivery PIN').evaluate().isEmpty; k++) {
+          await drag(t, -300, hold: 0.8);
+        }
+        await hold(t, 1.5);
+        final head = find.text('Your delivery PIN');
+        if (head.evaluate().isNotEmpty) {
+          await drag(t, -380, hold: 1.2);
+          await drag(t, -380, hold: 1.5);
+          final hr = t.getRect(head.first);
+          final ds = [
+            for (final e in find.byType(Text).evaluate())
+              if (RegExp(r'^\d$').hasMatch((e.widget as Text).data ?? '') && t.getRect(find.byWidget(e.widget)).top > hr.bottom && t.getRect(find.byWidget(e.widget)).top < hr.bottom + 140)
+                (t.getRect(find.byWidget(e.widget)).left, (e.widget as Text).data!)
+          ]..sort((x, y) => x.$1.compareTo(y.$1));
+          debugPrint('DEMO pin ${ds.map((d) => d.$2).join()}');
+        }
+        await hold(t, 5);
+      case 'deliver':
+        await hold(t, 3);
+        await tap(t, 'Enter PIN and deliver', after: 3);
+        final field = find.byType(TextField);
+        if (field.evaluate().isNotEmpty && _pin.isNotEmpty) await t.enterText(field.last, _pin);
+        await hold(t, 2.5);
+        await tap(t, 'Confirm', last: true, after: 4);
+        await tap(t, 'Earnings', last: true, after: 4);
+      case 'receipt':
+        await tap(t, 'Shop', last: true, after: 3);
+        final menu = find.byIcon(Icons.menu_rounded);
+        if (menu.evaluate().isNotEmpty) await t.tap(menu.first, warnIfMissed: false);
+        await hold(t, 1.5);
+        await tap(t, 'My orders', after: 3);
+        await drag(t, -250, hold: 3);
       case 'impact':
         await tap(t, 'Me', last: true, after: 2);
         await tap(t, 'Impact evidence', scrollTo: true, after: 4);

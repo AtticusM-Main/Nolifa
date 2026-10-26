@@ -25,6 +25,8 @@ for line in p.stdout:
     last[0] = time.time()
     if 'DEMO hook' in line:
         subprocess.Popen(['python3', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'demo_hook.py'), line.split('DEMO hook')[1].strip()])
+    if 'DEMO pin' in line:
+        open('/tmp/demo_pin', 'w').write(line.split('DEMO pin')[1].strip())
     if 'DEMO begin' in line and begin is None:
         begin = time.time() - t0
         subprocess.run(['xcrun', 'simctl', 'privacy', dev, 'grant', 'location', 'com.nolifa.app'], stderr=subprocess.DEVNULL)

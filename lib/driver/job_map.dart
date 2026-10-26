@@ -80,7 +80,8 @@ Future<RouteInfo> driveRoute(List<LatLng> pts) async {
     for (var i = 0; i < pts.length - 1; i++) {
       m += d(pts[i], pts[i + 1]);
     }
-    final km = m / 1000 * 1.3; // roads are longer than straight lines
+    // A stop with no usable position would make this NaN; show a small honest estimate instead.
+    final km = m.isFinite ? m / 1000 * 1.3 : 0.0; // roads are longer than straight lines
     return RouteInfo(pts, km, (km / 40 * 60).round().clamp(1, 600), false);
   }
 }
@@ -218,7 +219,7 @@ class _JobRouteMapState extends ConsumerState<JobRouteMap> {
     return Stack(children: [
       FlutterMap(
         options: MapOptions(
-          initialCameraFit: CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(36)),
+          initialCameraFit: CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(36), maxZoom: 15),
           interactionOptions: const InteractionOptions(flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag),
         ),
         children: [

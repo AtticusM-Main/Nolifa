@@ -95,8 +95,8 @@ API keys live in Supabase Edge Function secrets, never in the app or this reposi
 ## Run it
 
 ```bash
-git clone https://github.com/MpumeleloM03/Nolifa-Grow.git
-cd Nolifa-Grow
+git clone https://github.com/AtticusM-Main/Nolifa.git
+cd Nolifa
 flutter pub get
 flutter run --flavor nolifa -t lib/main.dart        # Nolifa Grow (everyone)
 flutter run --flavor grow   -t lib/main_grow.dart   # farmers edition

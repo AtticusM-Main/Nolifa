@@ -133,7 +133,7 @@ class AboutScreen extends StatelessWidget {
                 SizedBox(height: 6),
                 Text('Feedback, partnerships or support:', style: TextStyle(color: Colors.white70, fontSize: 13)),
                 SizedBox(height: 4),
-                Text('github.com/MpumeleloM03/Nolifa-Grow', style: TextStyle(color: Colors.white, fontSize: 13)),
+                Text('github.com/AtticusM-Main/Nolifa', style: TextStyle(color: Colors.white, fontSize: 13)),
               ]),
             ),
             const SizedBox(height: 24),
